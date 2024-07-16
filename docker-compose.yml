@@ -1,21 +1,54 @@
-# THIS DOCKERFILE IS INTENDED FOR DEVELOPMENT ENVIRONMENTS
-# DO NOT USE THIS FOR PRODUCTION USAGES.
-
-version: '3'
-
+version: '3.8'
 services:
-  postgresql:
-    image: docker.io/bitnami/postgresql:16
+  postgresdb:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    container_name: db
     ports:
-      - '5432:5432'
-    volumes:
-      - 'postgresql_data:/bitnami/postgresql'
+      - $DB_LOCAL_PORT:$DB_DOCKER_PORT
+    env_file: ./.env
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - POSTGRESQL_DATABASE=nestjs
-      - POSTGRESQL_USERNAME=nestjs
-      - POSTGRESQL_PASSWORD=password
-
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_ROOT_PASSWORD
+      - POSTGRES_DB=$DB_DATABASE
+    volumes:
+      - db:/var/lib/postgres
+  cache:
+    image: redis:6.2-alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - cache:/data
+  # app:
+  #   depends_on:
+  #     - postgresdb
+  #     - cache
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   image: ticketon
+  #   container_name: ticketon
+  #   restart: unless-stopped
+  #   command: npm run start
+  #   environment:
+  #     - DB_HOST=postgresdb
+  #     - DB_USER=$DB_USER
+  #     - DB_PASSWORD=$DB_ROOT_PASSWORD
+  #     - DB_NAME=$DB_DATABASE
+  #     - DB_PORT=$DB_DOCKER_PORT
+  #     - REDIS_HOST=cache # вынести в env
+  #     - REDIS_PORT=6379
+  #     - REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+  #   volumes:
+  #     - .:/usr/app/
+  #     - /usr/app/node_modules
+  #   ports:
+  #     - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+  #   stdin_open: true
+  #   tty: true
 volumes:
-  postgresql_data:
+  db:
+  cache:
     driver: local
