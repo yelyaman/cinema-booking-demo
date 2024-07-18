@@ -1,8 +1,12 @@
-import { IsEmail, IsString, IsUUID } from "class-validator";
+import { IsEmail, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { Role } from 'src/common/enums';
 
 export class CreateUserDto {
-  @IsUUID()
-  cinema_id: string;
+  @IsEnum({
+    enum: Role,
+  })
+  @IsOptional()
+  role: Role;
 
   @IsString()
   firstName: string;
@@ -11,6 +15,7 @@ export class CreateUserDto {
   lastName: string;
 
   @IsString()
+  @IsOptional()
   middleName: string;
 
   @IsEmail()
