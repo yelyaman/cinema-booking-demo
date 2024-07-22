@@ -17,7 +17,6 @@ export class UsersService {
   }
 
   async create(body: CreateUserDto): Promise<User> {
-    console.log(body);
     const already = await this.usersRepository.findOne({
       where: { email: body.email },
     });
@@ -32,5 +31,9 @@ export class UsersService {
 
     console.log(user);
     return user;
+  }
+
+  async getList() {
+    return this.usersRepository.find();
   }
 }
