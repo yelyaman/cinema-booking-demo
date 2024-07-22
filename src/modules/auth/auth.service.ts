@@ -5,12 +5,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { SignInDto } from './auth.dto';
+import { JwtPayload, SignInDto } from './auth.dto';
 import { CreateUserDto } from '../users/users.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -28,54 +29,53 @@ export class AuthService {
       throw new UnauthorizedException();
 
     const { password, ...rest } = user;
-    const tokens = await this.generateTokens(rest);
-    await this.saveRefreshToken(tokens.refreshToken, rest);
 
-    return tokens;
+    const accessToken = await this.generateAccessToken(rest);
+
+    const refreshToken = await this.jwtService.signAsync(rest, {
+      secret: process.env.REFRESH_KEY,
+      expiresIn: 180,
+    });
+
+    await this.saveRefreshToken(refreshToken, rest);
+
+    return { accessToken, refreshToken };
   }
 
   async signUp(body: CreateUserDto) {
     return await this.usersService.create(body);
   }
 
-  async signOut(accessToken: string, refreshToken: string) {
-    const user = await this.jwtService.verifyAsync(refreshToken, { secret: process.env.REFRESH_KEY})
+  async signOut(user: JwtPayload) {
+    await this.setTokenBlackList(user.accessTokenId);
+    await this.cacheManager.del(`refreshToken:${user.id}`);
 
-    
+    return { msg: 'signed out' };
   }
 
-  async refresh(refreshToken: string) {
-    const currentRefreshTokenPayload = await this.jwtService.verifyAsync(refreshToken, { secret: process.env.REFRESH_KEY});
+  async refresh(refreshToken: string, accessToken: string) {
+    const oldAccessTokenPayload = await this.jwtService.decode(accessToken);
 
+    await this.jwtService.verifyAsync(refreshToken, {
+      secret: process.env.REFRESH_KEY,
+    });
     const cachedRefreshToken = await this.cacheManager.get(
-      `refreshToken:${currentRefreshTokenPayload.id}`,
+      `refreshToken:${oldAccessTokenPayload.id}`,
     );
 
     if (!cachedRefreshToken || cachedRefreshToken != refreshToken)
       throw new UnauthorizedException('Invalid refresh token');
 
-    const payload = await this.jwtService.verifyAsync(refreshToken, {
-      secret: process.env.REFRESH_KEY,
-    });
+    await this.setTokenBlackList(oldAccessTokenPayload.accessTokenId);
 
-    if (!payload) throw new BadRequestException('invalid refresh token');
+    const newAccessToken = await this.generateAccessToken(
+      oldAccessTokenPayload,
+    );
 
-    const newTokens = await this.generateTokens(payload);
-    await this.saveRefreshToken(newTokens.refreshToken, payload);
+    console.log(newAccessToken);
 
-    return newTokens;
+    return { accessToken: newAccessToken };
   }
-
-  private generateTokens = async (user) => {
-    const accessToken = await this.jwtService.signAsync(user, {
-      secret: process.env.JWT_KEY,
-    });
-    const refreshToken = await this.jwtService.signAsync(user, {
-      secret: process.env.REFRESH_KEY,
-    });
-
-    return { accessToken, refreshToken };
-  };
 
   private saveRefreshToken = async (refreshToken, user) => {
     await this.cacheManager.set(
@@ -83,5 +83,29 @@ export class AuthService {
       refreshToken,
       1000 * 180,
     );
+  };
+
+  private generateAccessToken = async (payload) => {
+    const accessTokenId = uuid();
+    const { exp, iat, ...purePayload } = payload;
+
+    console.log(purePayload);
+    const accessToken = await this.jwtService.signAsync(
+      { ...purePayload, accessTokenId },
+      {
+        secret: process.env.JWT_KEY,
+        expiresIn: 180,
+      },
+    );
+
+    return accessToken;
+  };
+
+  private setTokenBlackList = async (accessTokenId: string) => {
+    await this.cacheManager.set(
+      `blacklist:${accessTokenId}`,
+      accessTokenId,
+      60 * 60 * 1000 * 24 * 10,
+    ); // 10 дней
   };
 }

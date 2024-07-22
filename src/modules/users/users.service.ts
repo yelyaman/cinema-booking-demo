@@ -17,6 +17,7 @@ export class UsersService {
   }
 
   async create(body: CreateUserDto): Promise<User> {
+    console.log(body);
     const already = await this.usersRepository.findOne({
       where: { email: body.email },
     });
@@ -24,9 +25,12 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(body.password, 12);
 
-    return this.usersRepository.create({
+    const user = this.usersRepository.save({
       ...body,
       password: hashedPassword,
     });
+
+    console.log(user);
+    return user;
   }
 }

@@ -7,6 +7,7 @@ import { Country } from './entities/country.entity';
 import { City } from './entities/city.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { User } from './entities/user.entity';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { UsersModule } from './modules/users/users.module';
       password: process.env.DB_ROOT_PASSWORD,
       database: process.env.DB_DATABASE,
       synchronize: true,
-      entities: [Country, City],
+      entities: [Country, City, User],
     }),
     AuthModule,
     UsersModule,

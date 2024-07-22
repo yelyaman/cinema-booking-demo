@@ -21,13 +21,13 @@ export class User {
   role: Role;
 
   @Column()
-  first_name: string;
+  firstName: string;
 
   @Column()
-  last_name: string;
+  lastName: string;
 
   @Column()
-  middle_name: string;
+  middleName: string;
 
   @Column()
   email: string;
