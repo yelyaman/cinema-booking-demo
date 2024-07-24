@@ -4,9 +4,11 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Cinema } from './cinema.entity';
 
 @Entity()
 export class User {
@@ -19,6 +21,9 @@ export class User {
     default: Role.CONSUMER,
   })
   role: Role;
+
+  @ManyToOne(() => Cinema, cinema => cinema.users)
+  cinema: Cinema
 
   @Column()
   firstName: string;

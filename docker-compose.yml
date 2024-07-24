@@ -21,10 +21,23 @@ services:
     command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
       - cache:/data
+  # rabbitmq:
+  #   image: rabbitmq:3.10.7-management
+  #   hostname: rabbitmq
+  #   restart: always
+  #   environment:
+  #   #   - RABBITMQ_DEFAULT_USER=rmuser
+  #   #   - RABBITMQ_DEFAULT_PASS=rmpassword
+  #   - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
+  #   volumes:
+  #     - ./rabbitmq:/var/lib/rabbitmq
+  #   ports:
+  #     - 15672:15672
   # app:
   #   depends_on:
   #     - postgresdb
   #     - cache
+  #     - rabbitmq
   #   build:
   #     context: .
   #     dockerfile: Dockerfile

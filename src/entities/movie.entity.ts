@@ -28,6 +28,9 @@ export class Movie {
   ratingAgeLimit: number
 
   @Column()
+  status: string
+
+  @Column()
   genres: string[]
 
   @CreateDateColumn()

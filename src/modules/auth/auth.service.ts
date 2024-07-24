@@ -94,7 +94,7 @@ export class AuthService {
       { ...purePayload, accessTokenId },
       {
         secret: process.env.JWT_KEY,
-        expiresIn: 180,
+        expiresIn: '1d',
       },
     );
 

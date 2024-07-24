@@ -10,28 +10,30 @@ import {
 import { SignInDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/users.dto';
-import { AuthGuard } from 'src/common/guards/auth.guard';
+import { Public } from 'src/common/decorators/ispublic.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(AuthGuard)
   @Get('info')
   getProfile(@Request() req) {
     return req.user;
   }
 
+  @Public()
   @Post('signin')
   async signin(@Body() signInDto: SignInDto) {
     return this.authService.signIn(signInDto);
   }
 
+  @Public()
   @Post('signup')
   async signup(@Body() createUserDto: CreateUserDto) {
     return this.authService.signUp(createUserDto);
   }
 
+  @Public()
   @Get('refresh')
   async refresh(
     @Headers('Authorization') authToken: string, 
@@ -41,7 +43,6 @@ export class AuthController {
     return this.authService.refresh(refreshToken, accessToken);
   }
 
-  @UseGuards(AuthGuard)
   @Get('signout')
   async signout(@Request() req) {
     await this.authService.signOut(req.user);

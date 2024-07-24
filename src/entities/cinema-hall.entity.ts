@@ -4,10 +4,12 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Cinema } from './cinema.entity';
+import { Seat } from './seat.entity';
 
 @Entity()
 export class CinemaHall {
@@ -19,6 +21,9 @@ export class CinemaHall {
 
   @ManyToOne(() => Cinema, (cinema) => cinema.cinemaHalls)
   cinema: Cinema
+
+  @OneToMany(() => Seat, seats => seats.cinemaHall)
+  seats: Seat[]
 
   @CreateDateColumn()
   createdAt: Date;

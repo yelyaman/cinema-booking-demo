@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 import { ConfigModule } from '@nestjs/config';
 import { Country } from './entities/country.entity';
@@ -8,6 +8,9 @@ import { City } from './entities/city.entity';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { User } from './entities/user.entity';
+import { AuthGuard } from './common/guards/auth.guard';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { MoviesModule } from './modules/movies/movies.module';
 
 @Module({
   imports: [
@@ -20,6 +23,8 @@ import { User } from './entities/user.entity';
       port: process.env.REDIS_PORT,
       password: process.env.REDIS_PASSWORD,
       isGlobal: true,
+      // ttl: 5,
+      // max: 10,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -33,8 +38,18 @@ import { User } from './entities/user.entity';
     }),
     AuthModule,
     UsersModule,
+    MoviesModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: CacheInterceptor,
+    // },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

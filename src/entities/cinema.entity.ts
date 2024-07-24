@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { CinemaHall } from './cinema-hall.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Cinema {
@@ -14,7 +15,10 @@ export class Cinema {
   id: string;
 
   @OneToMany(() => CinemaHall, (cinemaHalls) => cinemaHalls.cinema)
-  cinemaHalls: CinemaHall[]
+  cinemaHalls: CinemaHall[];
+
+  @OneToMany(() => User, (users) => users.cinema)
+  users: User[];
 
   @CreateDateColumn()
   createdAt: Date;
