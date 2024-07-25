@@ -3,9 +3,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Cinema } from './cinema.entity';
+import { KinopoisStatus as KinopoiskStatus } from 'src/modules/movies/movies.dto';
 
 @Entity()
 export class Movie {
@@ -13,25 +16,41 @@ export class Movie {
   id: string;
 
   @Column()
-  name: string
+  name: string;
+
+  @ManyToMany(() => Cinema, (cinemas) => cinemas.movies)
+  cinemas: Cinema[];
+
+  @Column({ unique: true })
+  kinopoiskId: string;
+
+  @Column({ nullable: true })
+  movieLength: number;
 
   @Column()
-  kinopoisk_id: string
+  description: string;
+
+  @Column({ default: 0 })
+  rating: number;
+
+  @Column({ default: 0 })
+  ratedCount: number;
 
   @Column()
-  rating: number
+  ratingAgeLimit: number;
 
   @Column()
-  rated_count: number
+  posterUrl: string;
 
-  @Column()
-  ratingAgeLimit: number
+  @Column({
+    type: 'enum',
+    enum: KinopoiskStatus,
+    default: KinopoiskStatus.ANNOUNCED,
+  })
+  status: KinopoiskStatus;
 
-  @Column()
-  status: string
-
-  @Column()
-  genres: string[]
+  @Column('varchar', { array: true })
+  genres: string[];
 
   @CreateDateColumn()
   createdAt: Date;

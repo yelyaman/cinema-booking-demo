@@ -38,6 +38,10 @@ export class KinopoiskGetAllParams {
   @IsNumber()
   limit: number;
 
+  @IsString()
+  @IsOptional()
+  name: string;
+
   @IsOptional()
   @IsEnum(KinopoiskSortFields, { each: true })
   sortField: KinopoiskSortFields[];

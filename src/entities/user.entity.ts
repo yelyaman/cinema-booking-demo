@@ -22,16 +22,16 @@ export class User {
   })
   role: Role;
 
-  @ManyToOne(() => Cinema, cinema => cinema.users)
-  cinema: Cinema
+  @ManyToOne(() => Cinema, (cinema) => cinema.users)
+  cinema: Cinema;
 
   @Column()
   firstName: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName: string;
 
-  @Column()
+  @Column({ nullable: true })
   middleName: string;
 
   @Column()

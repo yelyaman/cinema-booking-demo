@@ -56,13 +56,11 @@ export class AuthService {
   async refresh(refreshToken: string, accessToken: string) {
     const oldAccessTokenPayload = await this.jwtService.decode(accessToken);
 
-    await this.jwtService.verifyAsync(refreshToken, {
-      secret: process.env.REFRESH_KEY,
-    });
     const cachedRefreshToken = await this.cacheManager.get(
       `refreshToken:${oldAccessTokenPayload.id}`,
     );
 
+    console.log(cachedRefreshToken)
     if (!cachedRefreshToken || cachedRefreshToken != refreshToken)
       throw new UnauthorizedException('Invalid refresh token');
 
@@ -71,8 +69,6 @@ export class AuthService {
     const newAccessToken = await this.generateAccessToken(
       oldAccessTokenPayload,
     );
-
-    console.log(newAccessToken);
 
     return { accessToken: newAccessToken };
   }

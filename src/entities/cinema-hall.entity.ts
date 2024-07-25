@@ -19,7 +19,7 @@ export class CinemaHall {
   @Column()
   numeration: number
 
-  @ManyToOne(() => Cinema, (cinema) => cinema.cinemaHalls)
+  @ManyToOne(() => Cinema, (cinema) => cinema.cinemaHalls, { nullable: false })
   cinema: Cinema
 
   @OneToMany(() => Seat, seats => seats.cinemaHall)
