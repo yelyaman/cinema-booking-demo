@@ -4,24 +4,28 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { CinemaHall } from './cinema-hall.entity';
 import { SeatStatus } from 'src/common/enums';
+import { Reservation } from './reservation.entity';
 
 @Entity()
 export class Seat {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => CinemaHall, cinemaHall => cinemaHall.seats)
-  cinemaHall: CinemaHall
+  @ManyToOne(() => CinemaHall, (cinemaHall) => cinemaHall.seats, {
+    nullable: false,
+  })
+  cinemaHall: CinemaHall;
 
-  @Column()
+  @Column({ nullable: false })
   rowNumber: number;
 
-  @Column()
+  @Column({ nullable: false })
   seatNumber: number;
 
   @Column({
@@ -30,6 +34,12 @@ export class Seat {
     default: SeatStatus.FREE,
   })
   status: SeatStatus;
+
+  @Column({ nullable: false })
+  price: number;
+
+  @OneToOne(() => Reservation, (reservation) => reservation.seat)
+  reservation: Reservation;
 
   @CreateDateColumn()
   createdAt: Date;

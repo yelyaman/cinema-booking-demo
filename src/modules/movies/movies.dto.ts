@@ -1,6 +1,6 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export enum KinopoisStatus {
+export enum KinopoiskStatus {
   ANNOUNCED = 'announced',
   COMPLETED = 'completed',
   FILMING = 'filming',
@@ -38,10 +38,6 @@ export class KinopoiskGetAllParams {
   @IsNumber()
   limit: number;
 
-  @IsString()
-  @IsOptional()
-  name: string;
-
   @IsOptional()
   @IsEnum(KinopoiskSortFields, { each: true })
   sortField: KinopoiskSortFields[];
@@ -51,10 +47,24 @@ export class KinopoiskGetAllParams {
   type: KinopoiskMovieType[];
 
   @IsOptional()
-  @IsEnum(KinopoisStatus, { each: true })
-  status: KinopoisStatus[];
+  @IsEnum(KinopoiskStatus, { each: true })
+  status: KinopoiskStatus[];
 
   @IsOptional()
   @IsString({ each: true })
   year: string[];
+}
+
+export class KinopoiskGetByNameParams {
+  @IsNumber()
+  @IsOptional()
+  page: number;
+
+  @IsOptional()
+  @IsNumber()
+  limit: number;
+
+  @IsString()
+  @IsOptional()
+  name: string;
 }

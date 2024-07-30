@@ -5,10 +5,12 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Cinema } from './cinema.entity';
+import { Reservation } from './reservation.entity';
 
 @Entity()
 export class User {
@@ -24,6 +26,9 @@ export class User {
 
   @ManyToOne(() => Cinema, (cinema) => cinema.users)
   cinema: Cinema;
+
+  @OneToMany(() => Reservation, (reservations) => reservations.user)
+  reservations: Reservation[];
 
   @Column()
   firstName: string;

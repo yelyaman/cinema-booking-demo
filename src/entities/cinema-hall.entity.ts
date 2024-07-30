@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Cinema } from './cinema.entity';
 import { Seat } from './seat.entity';
+import { Schedule } from './schedule.entity';
 
 @Entity()
 export class CinemaHall {
@@ -17,13 +18,16 @@ export class CinemaHall {
   id: string;
 
   @Column()
-  numeration: number
+  numeration: number;
 
   @ManyToOne(() => Cinema, (cinema) => cinema.cinemaHalls, { nullable: false })
-  cinema: Cinema
+  cinema: Cinema;
 
-  @OneToMany(() => Seat, seats => seats.cinemaHall)
-  seats: Seat[]
+  @OneToMany(() => Seat, (seats) => seats.cinemaHall, { cascade: true })
+  seats: Seat[];
+
+  @OneToMany(() => Schedule, (schedules) => schedules.cinemaHall)
+  schedules: Schedule[];
 
   @CreateDateColumn()
   createdAt: Date;

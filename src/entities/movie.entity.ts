@@ -4,11 +4,13 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Cinema } from './cinema.entity';
-import { KinopoisStatus as KinopoiskStatus } from 'src/modules/movies/movies.dto';
+import { KinopoiskStatus as KinopoiskStatus } from 'src/modules/movies/movies.dto';
+import { Schedule } from './schedule.entity';
 
 @Entity()
 export class Movie {
@@ -21,8 +23,11 @@ export class Movie {
   @ManyToMany(() => Cinema, (cinemas) => cinemas.movies)
   cinemas: Cinema[];
 
+  @OneToMany(() => Schedule, schedule => schedule.movie)
+  schedules: Schedule[]
+
   @Column({ unique: true })
-  kinopoiskId: string;
+  kinopoiskId: number;
 
   @Column({ nullable: true })
   movieLength: number;
@@ -36,7 +41,7 @@ export class Movie {
   @Column({ default: 0 })
   ratedCount: number;
 
-  @Column()
+  @Column({ nullable: true })
   ratingAgeLimit: number;
 
   @Column()

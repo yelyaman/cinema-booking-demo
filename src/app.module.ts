@@ -18,6 +18,11 @@ import { CountriesModule } from './modules/countries/countries.module';
 import { CitiesModule } from './modules/cities/cities.module';
 import { CinemasModule } from './modules/cinemas/cinemas.module';
 import { Movie } from './entities/movie.entity';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { CinemaHallsModule } from './modules/cinema-halls/cinema-halls.module';
+import { SeatsModule } from './modules/seats/seats.module';
+import { ReservationModule } from './modules/reservation/reservation.module';
 
 @Module({
   imports: [
@@ -41,17 +46,41 @@ import { Movie } from './entities/movie.entity';
       password: process.env.DB_ROOT_PASSWORD,
       database: process.env.DB_DATABASE,
       synchronize: true,
-      entities: [Country, City, User, Cinema, CinemaHall, City, Country, Seat, Movie],
+      entities: [
+        Country,
+        City,
+        User,
+        Cinema,
+        CinemaHall,
+        City,
+        Country,
+        Seat,
+        Movie,
+      ],
     }),
+    TypeOrmModule.forFeature([
+      Country,
+      City,
+      User,
+      Cinema,
+      CinemaHall,
+      City,
+      Country,
+      Seat,
+      Movie,
+    ]),
     AuthModule,
     UsersModule,
     MoviesModule,
     CountriesModule,
     CitiesModule,
     CinemasModule,
+    CinemaHallsModule,
     MoviesModule,
+    SeatsModule,
+    ReservationModule
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [
     // {
     //   provide: APP_INTERCEPTOR,
@@ -61,6 +90,7 @@ import { Movie } from './entities/movie.entity';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    AppService,
   ],
 })
 export class AppModule {}
