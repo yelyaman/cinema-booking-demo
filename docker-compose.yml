@@ -1,11 +1,39 @@
 version: '3.8'
 services:
+  cinema-booking-app:
+    container_name: cinema-booking-app
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: ./apps/cinema-booking/Dockerfile
+    ports:
+      - 4000:4000
+    command: npm run start:dev
+    depends_on:
+      - postgresdb
+      - cache
+    volumes:
+      - .:/usr/src/app
+  chatting-app:
+    container_name: chatting-app
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: ./apps/chatting/Dockerfile
+    ports:
+      - 4001:4001
+    command: npm run start:dev
+    depends_on:
+      - postgresdb
+      - cache
+    volumes:
+      - .:/usr/src/app
   postgresdb:
     image: postgres:14-alpine
     restart: unless-stopped
     container_name: db
     ports:
-      - $DB_LOCAL_PORT:$DB_DOCKER_PORT
+      - $DB_DOCKER_PORT:$DB_DOCKER_PORT
     env_file: ./.env
     environment:
       - POSTGRES_USER=$DB_USER
@@ -17,51 +45,26 @@ services:
     image: redis:6.2-alpine
     restart: unless-stopped
     ports:
-      - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      - $REDIS_PORT:$REDIS_PORT
+    command: redis-server --save 20 1 --loglevel warning --requirepass $REDIS_PASSWORD
     volumes:
       - cache:/data
-  # rabbitmq:
-  #   image: rabbitmq:3.10.7-management
-  #   hostname: rabbitmq
-  #   restart: always
-  #   environment:
-  #   #   - RABBITMQ_DEFAULT_USER=rmuser
-  #   #   - RABBITMQ_DEFAULT_PASS=rmpassword
-  #   - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
-  #   volumes:
-  #     - ./rabbitmq:/var/lib/rabbitmq
-  #   ports:
-  #     - 15672:15672
-  # app:
-  #   depends_on:
-  #     - postgresdb
-  #     - cache
-  #     - rabbitmq
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   image: ticketon
-  #   container_name: ticketon
-  #   restart: unless-stopped
-  #   command: npm run start
-  #   environment:
-  #     - DB_HOST=postgresdb
-  #     - DB_USER=$DB_USER
-  #     - DB_PASSWORD=$DB_ROOT_PASSWORD
-  #     - DB_NAME=$DB_DATABASE
-  #     - DB_PORT=$DB_DOCKER_PORT
-  #     - REDIS_HOST=cache # вынести в env
-  #     - REDIS_PORT=6379
-  #     - REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
-  #   volumes:
-  #     - .:/usr/app/
-  #     - /usr/app/node_modules
-  #   ports:
-  #     - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-  #   stdin_open: true
-  #   tty: true
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=rmuser
+      - RABBITMQ_DEFAULT_PASS=rmpassword
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    ports:
+      - 5672:5672 
+      - 15672:15672
+
 volumes:
+  rabbitmq:
   db:
   cache:
     driver: local

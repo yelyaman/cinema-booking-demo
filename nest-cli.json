@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/cinema-booking/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/cinema-booking/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/cinema-booking",
+  "projects": {
+    "cinema-booking": {
+      "type": "application",
+      "root": "apps/cinema-booking",
+      "entryFile": "main",
+      "sourceRoot": "apps/cinema-booking/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/cinema-booking/tsconfig.app.json"
+      }
+    },
+    "chatting": {
+      "type": "application",
+      "root": "apps/chatting",
+      "entryFile": "main",
+      "sourceRoot": "apps/chatting/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/chatting/tsconfig.app.json"
+      }
+    }
   }
 }
