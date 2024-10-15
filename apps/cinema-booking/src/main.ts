@@ -15,10 +15,10 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new HttpExceptionFilter());
   app.setGlobalPrefix('v1');
-
-  const port = 3000;
-  await app.listen(port, () => {
-    console.log(`App started on PORT:${port}`);
+  
+  const PORT = process.env.CINEMA_PORT || 3000;
+  await app.listen(PORT, () => {
+    console.log(`App started on PORT:${PORT}`);
   });
 }
 bootstrap();
